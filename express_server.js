@@ -11,6 +11,7 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+//GET
 app.get('/', (req,res)=>{
   res.send('Hello!');
 });
@@ -29,11 +30,18 @@ app.get('/urls/:shortURL', (req,res)=>{
   res.render('urls_show', templateVars);
 });
 
+app.get("/u/:shortURL", (req, res) => {
+  res.redirect(urlDatabase[req.params.shortURL]);
+});
+
+
+//POST
 app.post('/urls', (req,res) =>{
   let shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL;
-  res.send('Ok');
+  res.redirect(`urls/${shortURL}`);
 });
+
 
 
 app.listen(PORT, ()=>{
@@ -54,7 +62,7 @@ const generateRandomString = () => {
   let newStr = '';
   
   for(let i = 0; i < 6; i++){
-    let rand = Math.floor(Math.random() * 36 - 1);
+    let rand = Math.floor(Math.random() * 36);
     newStr += string[rand];
   }
   return newStr;
