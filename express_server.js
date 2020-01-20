@@ -56,6 +56,14 @@ app.post('/urls/:shortURL/delete', (req,res) =>{
   res.redirect('/urls')
 });
 
+app.post('/urls/:id', (req,res) =>{
+
+  let param = req.params.id;
+  urlDatabase[param] = req.body.updateURL;
+  res.redirect('/urls');
+
+});
+
 
 
 
