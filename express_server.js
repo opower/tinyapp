@@ -58,7 +58,7 @@ app.post('/urls', (req,res) =>{
 app.post('/urls/:shortURL/delete', (req,res) =>{
   let param = req.params.shortURL;
   delete urlDatabase[param];
-  res.redirect('/urls')
+  res.redirect('/urls');
 });
 
 app.post('/urls/:id', (req,res) =>{
@@ -76,7 +76,7 @@ app.post('/login', (req,res)=>{
 
 app.post('/logout', (req,res)=>{
   res.clearCookie('username', req.body.username);
-  res.redirect('/urls')
+  res.redirect('/urls');
 });
 
 
@@ -92,9 +92,9 @@ const generateRandomString = () => {
   let string = 'abcdefghijklmnopqrstuvwxyz0123456789';
   let newStr = '';
   
-  for(let i = 0; i < 6; i++){
+  for (let i = 0; i < 6; i++) {
     let rand = Math.floor(Math.random() * 36);
     newStr += string[rand];
   }
   return newStr;
-}
+};
