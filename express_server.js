@@ -2,10 +2,11 @@ const express = require('express');
 const app = express();
 const PORT = 8080;
 
+app.set('view engine', 'ejs');
+
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
-app.set('view engine', 'ejs');
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -14,6 +15,7 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {};
 
 //GET
 app.get('/', (req,res)=>{
@@ -31,6 +33,11 @@ app.get('/urls/new', (req,res) => {
 });
 
 app.get('/urls/:shortURL', (req,res)=>{
+
+  if(!urlDatabase[req.params.shortURL]){
+    return res.render('errorPage', {url: req.params.shortURL})
+  }
+
   let templateVars = {shortURL : req.params.shortURL, longURL : urlDatabase[req.params.shortURL], username: req.cookies["username"]};
   res.render('urls_show', templateVars);
 });
@@ -41,6 +48,10 @@ app.get("/u/:shortURL", (req, res) => {
 
 app.get('/urls.json', (req,res) =>{
   res.json(urlDatabase);
+});
+
+app.get('/register', (req, res) =>{
+  res.render('registration');
 });
 
 app.get("/hello", (req, res) => {
@@ -79,13 +90,47 @@ app.post('/logout', (req,res)=>{
   res.redirect('/urls');
 });
 
+app.post('/register', (req, res) => {
+  const { email, password } = req.body;
+  if(email.length === 0 || password.length === 0){
+    return res.send('Status Code: 400! You Entered An Invalid Email / Password');
+  }
+  if(emailExist(email)){
+    return res.send('Status Code: 400! This Email is Already An Account');
+  }
+  const randomId = generateRandomString();
+  users[randomId] = {
+    id: randomId,
+    email,
+    password
+  }
+  res.cookie('user_id', randomId);
+  res.redirect('/urls')
+});
 
 
+//Catch all
+app.get('*', (req, res) =>{
+  res.redirect('/urls');
+});
 
 app.listen(PORT, ()=>{
   console.log(`Listening on port ${PORT}`);
 });
 
+const emailExist = (email) =>{
+  let userList = Object.values(users);
+
+  if(userList.length != 0){
+    for(const i of userList){
+      let values = Object.values(i);
+      if(values.includes(email)){
+        return true;
+      }
+    }
+  }
+  return false;
+}
 
 const generateRandomString = () => {
 
