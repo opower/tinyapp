@@ -15,7 +15,13 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-const users = {};
+const users = {
+  '123': {
+    id:'123',
+    email: 'opower@hotmail.com',
+    password: 'Love101'
+  }
+};
 
 //GET
 app.get('/', (req,res)=>{
@@ -23,12 +29,12 @@ app.get('/', (req,res)=>{
 });
 
 app.get('/urls', (req,res)=>{
-  let templateVars = {urls: urlDatabase, username: req.cookies["username"]};
+  let templateVars = {urls: urlDatabase, user: users[req.cookies["user_id"]]};
   res.render('urls_index' , templateVars);
 });
 
 app.get('/urls/new', (req,res) => {
-  let templateVars = {username: req.cookies['username']};
+  let templateVars = {user: users[req.cookies['user_id']]};
   res.render('urls_new', templateVars);
 });
 
@@ -38,7 +44,7 @@ app.get('/urls/:shortURL', (req,res)=>{
     return res.render('errorPage', {url: req.params.shortURL})
   }
 
-  let templateVars = {shortURL : req.params.shortURL, longURL : urlDatabase[req.params.shortURL], username: req.cookies["username"]};
+  let templateVars = {shortURL : req.params.shortURL, longURL : urlDatabase[req.params.shortURL], user: users[req.cookies["user_id"]]};
   res.render('urls_show', templateVars);
 });
 
@@ -51,7 +57,11 @@ app.get('/urls.json', (req,res) =>{
 });
 
 app.get('/register', (req, res) =>{
-  res.render('registration');
+  res.render('registration', {user: undefined});
+});
+
+app.get('/login', (req,res) => {
+  res.render('login', {user: undefined});
 });
 
 app.get("/hello", (req, res) => {
@@ -80,13 +90,23 @@ app.post('/urls/:id', (req,res) =>{
 
 });
 
-app.post('/login', (req,res)=>{
-  res.cookie('username', req.body.username);
-  res.redirect('/urls');
+app.post('/login/:email', (req,res)=>{
+  const { email, password } = req.body;
+  let user = emailExist(email);
+  if(user){
+    if(password === user.password){
+      res.cookie('user_id', user.id);
+      return res.redirect('/urls');
+    }
+    else{
+      return res.send('Status Code: 403! Password Incorrect!');
+    }
+  }
+  res.send('Status Code: 403! Email Not Found!')
 });
 
-app.post('/logout', (req,res)=>{
-  res.clearCookie('username', req.body.username);
+app.post('/logout/:user', (req,res)=>{
+  res.clearCookie('user_id', req.params.user.id);
   res.redirect('/urls');
 });
 
@@ -122,10 +142,10 @@ const emailExist = (email) =>{
   let userList = Object.values(users);
 
   if(userList.length != 0){
-    for(const i of userList){
-      let values = Object.values(i);
+    for(const user of userList){
+      let values = Object.values(user);
       if(values.includes(email)){
-        return true;
+        return user;
       }
     }
   }

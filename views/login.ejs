@@ -11,17 +11,19 @@
 <body>
   <%- include('partials/_header.ejs') %>
   <main style="margin: 1em;">
-    <h1>Create An Account</h1>
-    <form action="/register" method="POST">
-      <label for="userEmail"> Email Address <br>
+    <h1>Login</h1>
+    <form action='/login/:email>' method="POST">
+      <label for="userEmail">
+        Email Address<br> 
         <input type="email" name="email" id="userEmail">
       </label>
       <br>
-      <label for='userPassword'> Password <br>
+      <label for='userPassword'>
+        Password: <br>
         <input type="password" name="password" id="userPassword">
       </label>
       <br>
-      <button type="submit" class="btn btn-primary">Submit</button>
+      <button type="submit" class="btn btn-primary">Login</button>
     </form>
   </main>
   
