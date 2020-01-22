@@ -83,21 +83,31 @@ app.post('/urls', (req,res) =>{
 
 app.post('/urls/:shortURL/delete', (req,res) =>{
   let param = req.params.shortURL;
-  delete urlDatabase[param];
+  if(req.cookies['url_id']){
+    let id = urlDatabase[param][userID];
+    if(urlDatabase[param][userID] && urlDatabase[param][userID] === req.cookies['user_id']){
+      delete urlDatabase[param];
+    }
+  }
   res.redirect('/urls');
+
 });
 
 app.post('/urls/:id', (req,res) =>{
 
   let param = req.params.id;
-  urlDatabase[param] = req.body.updateURL;
+  if(req.cookies['used_id']){
+    let userId = urlDatabase[param][userId];
+    if(userId === req.cookies['user_id']){
+      urlDatabase[param] = {longURL: req.body.updateURL, userID: req.cookies['user_id']}
+    }
+  }
   res.redirect('/urls');
 
 });
 
-// Update the edit and delete endpoints such that only the owner (creator) of the URL can edit or delete the link. Use a testing utility like cURL to confirm that if a user is not logged in, they cannot edit or delete urls.
 
-app.post('/login/:email', (req,res)=>{
+app.post('/login', (req,res)=>{
   const { email, password } = req.body;
   let user = emailExist(email);
   if (user) {
