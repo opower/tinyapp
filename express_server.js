@@ -1,3 +1,4 @@
+const { emailExist } = require('./helper.js');
 const express = require('express');
 const app = express();
 const PORT = 8080;
@@ -29,13 +30,6 @@ const users = {
     password: 'password'
   }
 };
-
-// To set the user_id key on a session, write:
-
-// req.session.user_id = "some value";
-// To read a value, write:
-
-// req.session.user_id
 
 //GET
 app.get('/', (req,res)=>{
@@ -122,7 +116,7 @@ app.post('/urls/:id', (req,res) =>{
 
 app.post('/login', (req,res)=>{
   const { email, password } = req.body;
-  let user = emailExist(email);
+  let user = emailExist(email, users);
   if (user) {
     if (bcrypt.compareSync(password, user.password)) {
       req.session.user_id = user.id;
@@ -145,7 +139,7 @@ app.post('/register', (req, res) => {
   if (email.length === 0 || password.length === 0) {
     return res.send('Status Code: 400! You Entered An Invalid Email / Password');
   }
-  if (emailExist(email)) {
+  if (emailExist(email, users)) {
     return res.send('Status Code: 400! This Email is Already An Account');
   }
   const randomId = generateRandomString();
@@ -170,19 +164,6 @@ app.listen(PORT, ()=>{
   console.log(`Listening on port ${PORT}`);
 });
 
-const emailExist = (email) =>{
-  let userList = Object.values(users);
-
-  if (userList.length !== 0) {
-    for (const user of userList) {
-      let values = Object.values(user);
-      if (values.includes(email)) {
-        return user;
-      }
-    }
-  }
-  return false;
-};
 
 const generateRandomString = () => {
 
