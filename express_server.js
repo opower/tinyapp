@@ -17,7 +17,7 @@ app.use(cookieSession({
 app.use(methodOverride('_method'));
 app.use(bodyParser.urlencoded({extended: true}));
 
-//Test Data
+//Data Structures
 const urlDatabase = {
 };
 const users = {
@@ -77,6 +77,12 @@ app.post('/urls', (req,res) =>{
   res.redirect(`/urls/${shortURL}`);
 });
 
+/**
+ * Checks to see if email exist in users object, if not, render error page. If it does, return a user object that contains an id, email, and password
+ * Use bcrypt to compare the entered password with the user password in the object
+ * Sets the req.session.user_id to the user's id in the object
+ * If passwords do not match render an error page
+ */
 app.post('/login', (req,res)=>{
   const { email, password } = req.body;
   let user = emailExist(email, users);
@@ -97,6 +103,12 @@ app.post('/logout/:user', (req,res)=>{
   res.redirect('/urls');
 });
 
+/**
+ * Checks if the email already exist, if so render and error page
+ * Uses bcrypt to hash user's password
+ * Creates a user object with randomized id, email, and hashed password
+ * Sets req.session.user_id to users random id
+ */
 app.post('/register', (req, res) => {
   const { email, password } = req.body;
   if (emailExist(email, users)) {
