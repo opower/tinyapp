@@ -24,7 +24,7 @@ const users = {
 
 };
 
-//GET
+//GET Routes
 app.get('/', (req,res)=>{
   res.redirect('/login');
 });
@@ -69,7 +69,7 @@ app.get('/login', (req,res) => {
 });
 
 
-//POST
+//POST Routes
 app.post('/urls', (req,res) =>{
   let shortURL = generateRandomString();
   let date = new Date().toLocaleString();
@@ -113,7 +113,7 @@ app.post('/register', (req, res) => {
   res.redirect('/urls');
 });
 
-//Delete
+//Delete Routes
 app.delete('/urls/:shortURL/delete', (req,res) =>{
   let param = req.params.shortURL;
   if (req.session.user_id) {
@@ -125,7 +125,7 @@ app.delete('/urls/:shortURL/delete', (req,res) =>{
   res.redirect('/urls');
 });
 
-//Put
+//Put Routes
 app.put('/urls/:id', (req,res) =>{
   let param = req.params.id;
   if (req.session.user_id) {
