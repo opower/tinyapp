@@ -53,7 +53,7 @@ app.get('/urls/new', (req,res) => {
 app.get('/urls/:shortURL', (req,res)=>{
 
   if (!urlDatabase[req.params.shortURL]) {
-    return res.render('errorPage', {url: req.params.shortURL});
+    return res.render('errorPage', {url: 'urls', user: undefined, msg: 'Short URL Does Not Exisit', status: 404, page: 'URL\'s'});
   }
 
   let templateVars = {shortURL : req.params.shortURL, longURL : urlDatabase[req.params.shortURL].longURL, user: users[req.session.user_id]};
@@ -122,10 +122,11 @@ app.post('/login', (req,res)=>{
       req.session.user_id = user.id;
       return res.redirect('/urls');
     } else {
-      return res.send('Status Code: 403! Password Incorrect!');
+      let templateVars = { status: 403, msg: 'Incorrect Password', url: 'login',  page: 'Login', user: undefined}
+      return res.render('errorPage', templateVars);
     }
   }
-  res.send('Status Code: 403! Email Not Found!');
+  res.render('errorPage', {status: 403, msg: 'Email Not Found!', user: undefined, url: 'register',  page: 'Register'});
 });
 
 
