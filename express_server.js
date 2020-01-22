@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const PORT = 8080;
+const bcrypt = require('bcrypt');
 
 app.set('view engine', 'ejs');
 
@@ -83,9 +84,9 @@ app.post('/urls', (req,res) =>{
 
 app.post('/urls/:shortURL/delete', (req,res) =>{
   let param = req.params.shortURL;
-  if(req.cookies['url_id']){
-    let id = urlDatabase[param][userID];
-    if(urlDatabase[param][userID] && urlDatabase[param][userID] === req.cookies['user_id']){
+  if(req.cookies['user_id']){
+    let id = urlDatabase[param].userID;
+    if(urlDatabase[param].userID && urlDatabase[param].userID === req.cookies['user_id']){
       delete urlDatabase[param];
     }
   }
@@ -96,9 +97,9 @@ app.post('/urls/:shortURL/delete', (req,res) =>{
 app.post('/urls/:id', (req,res) =>{
 
   let param = req.params.id;
-  if(req.cookies['used_id']){
-    let userId = urlDatabase[param][userId];
-    if(userId === req.cookies['user_id']){
+  if(req.cookies['user_id']){
+    let userId = urlDatabase[param].userID;
+    if(urlDatabase[param].userID && userId === req.cookies['user_id']){
       urlDatabase[param] = {longURL: req.body.updateURL, userID: req.cookies['user_id']}
     }
   }
@@ -111,7 +112,7 @@ app.post('/login', (req,res)=>{
   const { email, password } = req.body;
   let user = emailExist(email);
   if (user) {
-    if (password === user.password) {
+    if (bcrypt.compareSync(password, user.password)) {
       res.cookie('user_id', user.id);
       return res.redirect('/urls');
     } else {
@@ -120,6 +121,7 @@ app.post('/login', (req,res)=>{
   }
   res.send('Status Code: 403! Email Not Found!');
 });
+
 
 app.post('/logout/:user', (req,res)=>{
   res.clearCookie('user_id', req.params.user.id);
@@ -135,14 +137,16 @@ app.post('/register', (req, res) => {
     return res.send('Status Code: 400! This Email is Already An Account');
   }
   const randomId = generateRandomString();
+  const hashed = bcrypt.hashSync(password, 10);
   users[randomId] = {
     id: randomId,
     email,
-    password
+    password: hashed
   };
   res.cookie('user_id', randomId);
   res.redirect('/urls');
 });
+
 
 
 //Catch all
