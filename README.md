@@ -4,8 +4,9 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-!["screenshot description"](#)
-!["screenshot description"](#)
+!["urls-show page"](https://github.com/opower/tinyapp/blob/master/docs/urls-show.png?raw=true)
+!["urls page"](https://github.com/opower/tinyapp/blob/master/docs/urls-page.png?raw=true)
+!["email exist error page "](https://github.com/opower/tinyapp/blob/master/docs/email-exist.png?raw=true)
 
 ## Dependencies
 
@@ -15,6 +16,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 - bcrypt
 - body-parser
 - cookie-session
+- method_override
 
 ## Getting Started
 
