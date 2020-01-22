@@ -1,6 +1,6 @@
 /**
- * @param email 
- * @param database 
+ * @param email
+ * @param database
  * @return a user object that contains id, email, and password if the email exists in the data and false if not
  */
 const emailExist = (email, database) =>{
@@ -17,7 +17,7 @@ const emailExist = (email, database) =>{
 };
 
 /**
- * @returns a random generated 6 character string 
+ * @returns a random generated 6 character string
  */
 const generateRandomString = () => {
   let string = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -31,8 +31,8 @@ const generateRandomString = () => {
 };
 
 /**
- * @param id 
- * @param database 
+ * @param id
+ * @param database
  * @returns an urls object that contains the users urls
  */
 const urlsForUser = (id, database) => {
@@ -48,4 +48,4 @@ const urlsForUser = (id, database) => {
 };
 
 //exporting helper functions as a module
-module.exports = { emailExist, generateRandomString, urlsForUser };
+module.exports = { emailExist, generateRandomString, urlsForUser};

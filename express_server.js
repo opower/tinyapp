@@ -19,15 +19,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 //Test Data
 const urlDatabase = {
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "adsawd" }
 };
 const users = {
-  "aJ48lW": {
-    id: "aJ48lW",
-    email: 'olivia@hotmail.com',
-    password: 'password'
-  }
+
 };
 
 //GET
@@ -55,7 +49,7 @@ app.get('/urls/:shortURL', (req,res)=>{
     return res.render('errorPage', {url: 'urls', user: undefined, msg: 'Short URL Does Not Exisit', status: 404, page: 'URL\'s'});
   }
 
-  let templateVars = {shortURL : req.params.shortURL, longURL : urlDatabase[req.params.shortURL].longURL, user: users[req.session.user_id]};
+  let templateVars = {shortURL : req.params.shortURL, longURL : urlDatabase[req.params.shortURL].longURL, user: users[req.session.user_id], date: urlDatabase[req.params.shortURL].date};
   res.render('urls_show', templateVars);
 });
 
@@ -78,7 +72,8 @@ app.get('/login', (req,res) => {
 //POST
 app.post('/urls', (req,res) =>{
   let shortURL = generateRandomString();
-  urlDatabase[shortURL] = {longURL: req.body.longURL, userID: req.session.user_id};
+  let date = new Date().toLocaleString();
+  urlDatabase[shortURL] = {longURL: req.body.longURL, userID: req.session.user_id, date: date};
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -136,7 +131,8 @@ app.put('/urls/:id', (req,res) =>{
   if (req.session.user_id) {
     let userId = urlDatabase[param].userID;
     if (userId && userId === req.session.user_id) {
-      urlDatabase[param] = {longURL: req.body.updateURL, userID: req.session.user_id};
+      let date = new Date().toLocaleString();
+      urlDatabase[param] = {longURL: req.body.updateURL, userID: req.session.user_id, date: date};
     }
     else{
       return res.render('errorPage', {status: 401, msg:'You Do Not Have Access To Modify This URL', user: users[req.session.user_id] , page: 'URL\'s', url: 'urls' })
