@@ -11,4 +11,29 @@ const emailExist = (email, database) =>{
   return false;
 };
 
-module.exports = { emailExist };
+const generateRandomString = () => {
+
+  let string = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let newStr = '';
+  
+  for (let i = 0; i < 6; i++) {
+    let rand = Math.floor(Math.random() * 62);
+    newStr += string[rand];
+  }
+  return newStr;
+};
+
+const urlsForUser = (id, database) => {
+
+  let urls = {};
+  let entries = Object.entries(database);
+
+  for (const url of entries) {
+    if (url[1].userID === id) {
+      urls[url[0]] = url[1];
+    }
+  }
+  return urls;
+};
+
+module.exports = { emailExist, generateRandomString, urlsForUser };

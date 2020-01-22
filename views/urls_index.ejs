@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <title>TinyApp</title>
 </head>
-<body>
+<body style='background-color: #F5FBEF;'>
   <%- include('partials/_header.ejs') %>
   <main style="margin: 1em;">
     <% if(user) { %>
@@ -34,7 +34,7 @@
         </tbody>
       </table>
     <% } else { %>
-      <h1>Please Login to Access URL's</h1>
+      <h1 style='text-align: center; margin-top: 5rem;'>Please Login to Access URL's</h1>
     <% } %>
   </main>
   <!-- Bootstrap JS -->

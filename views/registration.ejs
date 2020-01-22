@@ -8,17 +8,17 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <title>Login</title>
 </head>
-<body>
+<body style='background-color: #F5FBEF; text-align: center;'>
   <%- include('partials/_header.ejs') %>
   <main style="margin: 1em;">
     <h1>Create An Account</h1>
     <form action="/register" method="POST">
       <label for="userEmail"> Email Address <br>
-        <input type="email" name="email" id="userEmail">
+        <input type="email" name="email" id="userEmail" required>
       </label>
       <br>
       <label for='userPassword'> Password <br>
-        <input type="password" name="password" id="userPassword">
+        <input type="password" name="password" id="userPassword" required>
       </label>
       <br>
       <button type="submit" class="btn btn-primary">Submit</button>
