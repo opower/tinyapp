@@ -10,16 +10,17 @@ app.use(cookieParser());
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
+
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "adsawd" }
 };
 
 const users = {
-  '123': {
-    id:'123',
-    email: 'opower@hotmail.com',
-    password: 'Love101'
+  "aJ48lW": {
+    id: "aJ48lW",
+    email: 'olivia@hotmail.com',
+    password: 'password'
   }
 };
 
@@ -29,27 +30,31 @@ app.get('/', (req,res)=>{
 });
 
 app.get('/urls', (req,res)=>{
-  let templateVars = {urls: urlDatabase, user: users[req.cookies["user_id"]]};
+  let database = urlsForUser(req.cookies['user_id']);
+  let templateVars = {urls: database, user: users[req.cookies["user_id"]]};
   res.render('urls_index' , templateVars);
 });
 
 app.get('/urls/new', (req,res) => {
+  if(!users[req.cookies['user_id']]){
+    return res.redirect('/urls')
+  }
   let templateVars = {user: users[req.cookies['user_id']]};
   res.render('urls_new', templateVars);
 });
 
 app.get('/urls/:shortURL', (req,res)=>{
 
-  if(!urlDatabase[req.params.shortURL]){
-    return res.render('errorPage', {url: req.params.shortURL})
+  if (!urlDatabase[req.params.shortURL]) {
+    return res.render('errorPage', {url: req.params.shortURL});
   }
 
-  let templateVars = {shortURL : req.params.shortURL, longURL : urlDatabase[req.params.shortURL], user: users[req.cookies["user_id"]]};
+  let templateVars = {shortURL : req.params.shortURL, longURL : urlDatabase[req.params.shortURL].longURL, user: users[req.cookies["user_id"]]};
   res.render('urls_show', templateVars);
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  res.redirect(urlDatabase[req.params.shortURL]);
+  res.redirect(urlDatabase[req.params.shortURL].longURL);
 });
 
 app.get('/urls.json', (req,res) =>{
@@ -72,7 +77,7 @@ app.get("/hello", (req, res) => {
 //POST
 app.post('/urls', (req,res) =>{
   let shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL] = {longURL: req.body.longURL, userID: req.cookies['user_id']}
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -90,19 +95,20 @@ app.post('/urls/:id', (req,res) =>{
 
 });
 
+// Update the edit and delete endpoints such that only the owner (creator) of the URL can edit or delete the link. Use a testing utility like cURL to confirm that if a user is not logged in, they cannot edit or delete urls.
+
 app.post('/login/:email', (req,res)=>{
   const { email, password } = req.body;
   let user = emailExist(email);
-  if(user){
-    if(password === user.password){
+  if (user) {
+    if (password === user.password) {
       res.cookie('user_id', user.id);
       return res.redirect('/urls');
-    }
-    else{
+    } else {
       return res.send('Status Code: 403! Password Incorrect!');
     }
   }
-  res.send('Status Code: 403! Email Not Found!')
+  res.send('Status Code: 403! Email Not Found!');
 });
 
 app.post('/logout/:user', (req,res)=>{
@@ -112,10 +118,10 @@ app.post('/logout/:user', (req,res)=>{
 
 app.post('/register', (req, res) => {
   const { email, password } = req.body;
-  if(email.length === 0 || password.length === 0){
+  if (email.length === 0 || password.length === 0) {
     return res.send('Status Code: 400! You Entered An Invalid Email / Password');
   }
-  if(emailExist(email)){
+  if (emailExist(email)) {
     return res.send('Status Code: 400! This Email is Already An Account');
   }
   const randomId = generateRandomString();
@@ -123,9 +129,9 @@ app.post('/register', (req, res) => {
     id: randomId,
     email,
     password
-  }
+  };
   res.cookie('user_id', randomId);
-  res.redirect('/urls')
+  res.redirect('/urls');
 });
 
 
@@ -141,16 +147,16 @@ app.listen(PORT, ()=>{
 const emailExist = (email) =>{
   let userList = Object.values(users);
 
-  if(userList.length != 0){
-    for(const user of userList){
+  if (userList.length !== 0) {
+    for (const user of userList) {
       let values = Object.values(user);
-      if(values.includes(email)){
+      if (values.includes(email)) {
         return user;
       }
     }
   }
   return false;
-}
+};
 
 const generateRandomString = () => {
 
@@ -163,3 +169,18 @@ const generateRandomString = () => {
   }
   return newStr;
 };
+
+
+const urlsForUser = (id) => {
+
+  let urls = {}; 
+  let entries = Object.entries(urlDatabase);
+
+  for(const url of entries){
+    if(url[1].userID === id){
+      urls[url[0]] = url[1];
+    }
+  }
+  return urls;
+}
+
