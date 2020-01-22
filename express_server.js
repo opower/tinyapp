@@ -5,22 +5,23 @@ const PORT = 8080;
 const bcrypt = require('bcrypt');
 const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session');
+const methodOverride = require('method-override');
 
 app.set('view engine', 'ejs');
 
+//Middleware
 app.use(cookieSession({
   name: 'session',
   keys: ['this-is-confusing'],
 }));
-
+app.use(methodOverride('_method'));
 app.use(bodyParser.urlencoded({extended: true}));
 
-
+//Test Data
 const urlDatabase = {
   b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
   i3BoGr: { longURL: "https://www.google.ca", userID: "adsawd" }
 };
-
 const users = {
   "aJ48lW": {
     id: "aJ48lW",
@@ -59,6 +60,9 @@ app.get('/urls/:shortURL', (req,res)=>{
 });
 
 app.get("/u/:shortURL", (req, res) => {
+  if(!urlDatabase[req.params.shortURL]){
+    res.render('errorPage', {status:403, msg:'Short URL does not exist', page: 'Your URLS', user: undefined, url:'urls'});
+  }
   res.redirect(urlDatabase[req.params.shortURL].longURL);
 });
 
@@ -78,28 +82,6 @@ app.post('/urls', (req,res) =>{
   res.redirect(`/urls/${shortURL}`);
 });
 
-app.post('/urls/:shortURL/delete', (req,res) =>{
-  let param = req.params.shortURL;
-  if (req.session.user_id) {
-    let id = urlDatabase[param].userID;
-    if (id && id === req.session.user_id) {
-      delete urlDatabase[param];
-    }
-  }
-  res.redirect('/urls');
-});
-
-app.post('/urls/:id', (req,res) =>{
-  let param = req.params.id;
-  if (req.session.user_id) {
-    let userId = urlDatabase[param].userID;
-    if (userId && userId === req.session.user_id) {
-      urlDatabase[param] = {longURL: req.body.updateURL, userID: req.session.user_id};
-    }
-  }
-  res.redirect('/urls');
-});
-
 app.post('/login', (req,res)=>{
   const { email, password } = req.body;
   let user = emailExist(email, users);
@@ -114,7 +96,6 @@ app.post('/login', (req,res)=>{
   }
   res.render('errorPage', {status: 403, msg: 'Email Not Found!', user: undefined, url: 'register',  page: 'Register'});
 });
-
 
 app.post('/logout/:user', (req,res)=>{
   req.session = null;
@@ -134,6 +115,33 @@ app.post('/register', (req, res) => {
     password: hashed
   };
   req.session.user_id = randomId;
+  res.redirect('/urls');
+});
+
+//Delete
+app.delete('/urls/:shortURL/delete', (req,res) =>{
+  let param = req.params.shortURL;
+  if (req.session.user_id) {
+    let id = urlDatabase[param].userID;
+    if (id && id === req.session.user_id) {
+      delete urlDatabase[param];
+    }
+  }
+  res.redirect('/urls');
+});
+
+//Put
+app.put('/urls/:id', (req,res) =>{
+  let param = req.params.id;
+  if (req.session.user_id) {
+    let userId = urlDatabase[param].userID;
+    if (userId && userId === req.session.user_id) {
+      urlDatabase[param] = {longURL: req.body.updateURL, userID: req.session.user_id};
+    }
+    else{
+      return res.render('errorPage', {status: 401, msg:'You Do Not Have Access To Modify This URL', user: users[req.session.user_id] , page: 'URL\'s', url: 'urls' })
+    }
+  }
   res.redirect('/urls');
 });
 

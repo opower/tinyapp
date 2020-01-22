@@ -1,3 +1,8 @@
+/**
+ * @param email 
+ * @param database 
+ * @return a user object that contains id, email, and password if the email exists in the data and false if not
+ */
 const emailExist = (email, database) =>{
   let userList = Object.values(database);
   if (userList.length !== 0) {
@@ -11,8 +16,10 @@ const emailExist = (email, database) =>{
   return false;
 };
 
+/**
+ * @returns a random generated 6 character string 
+ */
 const generateRandomString = () => {
-
   let string = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let newStr = '';
   
@@ -23,8 +30,12 @@ const generateRandomString = () => {
   return newStr;
 };
 
+/**
+ * @param id 
+ * @param database 
+ * @returns an urls object that contains the users urls
+ */
 const urlsForUser = (id, database) => {
-
   let urls = {};
   let entries = Object.entries(database);
 
@@ -36,4 +47,5 @@ const urlsForUser = (id, database) => {
   return urls;
 };
 
+//exporting helper functions as a module
 module.exports = { emailExist, generateRandomString, urlsForUser };
