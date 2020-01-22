@@ -43,8 +43,8 @@ app.get('/urls', (req,res)=>{
 });
 
 app.get('/urls/new', (req,res) => {
-  if(!users[req.session.user_id]){
-    return res.redirect('/urls')
+  if (!users[req.session.user_id]) {
+    return res.redirect('/urls');
   }
   let templateVars = {user: users[req.session.user_id]};
   res.render('urls_new', templateVars);
@@ -84,15 +84,15 @@ app.get("/hello", (req, res) => {
 //POST
 app.post('/urls', (req,res) =>{
   let shortURL = generateRandomString();
-  urlDatabase[shortURL] = {longURL: req.body.longURL, userID: req.session.user_id}
+  urlDatabase[shortURL] = {longURL: req.body.longURL, userID: req.session.user_id};
   res.redirect(`/urls/${shortURL}`);
 });
 
 app.post('/urls/:shortURL/delete', (req,res) =>{
   let param = req.params.shortURL;
-  if(req.session.user_id){
+  if (req.session.user_id) {
     let id = urlDatabase[param].userID;
-    if(urlDatabase[param].userID && urlDatabase[param].userID === req.session.user_id){
+    if (id && id === req.session.user_id) {
       delete urlDatabase[param];
     }
   }
@@ -103,10 +103,10 @@ app.post('/urls/:shortURL/delete', (req,res) =>{
 app.post('/urls/:id', (req,res) =>{
 
   let param = req.params.id;
-  if(req.session.user_id){
+  if (req.session.user_id) {
     let userId = urlDatabase[param].userID;
-    if(urlDatabase[param].userID && userId === req.session.user_id){
-      urlDatabase[param] = {longURL: req.body.updateURL, userID: req.session.user_id}
+    if (userId && userId === req.session.user_id) {
+      urlDatabase[param] = {longURL: req.body.updateURL, userID: req.session.user_id};
     }
   }
   res.redirect('/urls');
@@ -122,7 +122,7 @@ app.post('/login', (req,res)=>{
       req.session.user_id = user.id;
       return res.redirect('/urls');
     } else {
-      let templateVars = { status: 403, msg: 'Incorrect Password', url: 'login',  page: 'Login', user: undefined}
+      let templateVars = { status: 403, msg: 'Incorrect Password', url: 'login',  page: 'Login', user: undefined};
       return res.render('errorPage', templateVars);
     }
   }
@@ -181,14 +181,14 @@ const generateRandomString = () => {
 
 const urlsForUser = (id) => {
 
-  let urls = {}; 
+  let urls = {};
   let entries = Object.entries(urlDatabase);
 
-  for(const url of entries){
-    if(url[1].userID === id){
+  for (const url of entries) {
+    if (url[1].userID === id) {
       urls[url[0]] = url[1];
     }
   }
   return urls;
-}
+};
 
