@@ -71,14 +71,18 @@ app.get('/login', (req,res) => {
 
 //POST Routes
 app.post('/urls', (req,res) =>{
-  const { longURL: userUrl } = req.body;
+  const { longURL } = req.body;
   let shortURL = generateRandomString();
   let date = new Date().toLocaleString();
-  if(!userUrl.includes('http://')){
-    longURL = 'http://' + userUrl;
-  }
   req.session.linkCount = 0;
-  urlDatabase[shortURL] = {longURL, userID: req.session.user_id, date: date, count: req.session.linkCount};
+
+  if(!longURL.includes('http://')){
+    let url = 'http://' + longURL;
+    urlDatabase[shortURL] = {longURL: url , userID: req.session.user_id, date: date, count: req.session.linkCount};
+  }
+  else{
+    urlDatabase[shortURL] = {longURL , userID: req.session.user_id, date: date, count: req.session.linkCount};
+  }
   res.redirect(`/urls/${shortURL}`);
 });
 
