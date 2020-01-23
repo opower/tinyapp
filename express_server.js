@@ -49,7 +49,7 @@ app.get('/urls/:shortURL', (req,res)=>{
     return res.render('errorPage', {url: 'urls', user: undefined, msg: 'Short URL Does Not Exisit', status: 404, page: 'URL\'s'});
   }
 
-  let templateVars = {shortURL : req.params.shortURL, longURL : urlDatabase[req.params.shortURL].longURL, user: users[req.session.user_id], date: urlDatabase[req.params.shortURL].date};
+  let templateVars = {shortURL : req.params.shortURL, longURL : urlDatabase[req.params.shortURL].longURL, user: users[req.session.user_id], date: urlDatabase[req.params.shortURL].date, count: req.session.linkCount}
   res.render('urls_show', templateVars);
 });
 
@@ -71,9 +71,14 @@ app.get('/login', (req,res) => {
 
 //POST Routes
 app.post('/urls', (req,res) =>{
+  const { longURL: userUrl } = req.body;
   let shortURL = generateRandomString();
   let date = new Date().toLocaleString();
-  urlDatabase[shortURL] = {longURL: req.body.longURL, userID: req.session.user_id, date: date};
+  if(!userUrl.includes('http://')){
+    longURL = 'http://' + userUrl;
+  }
+  req.session.linkCount = 0;
+  urlDatabase[shortURL] = {longURL, userID: req.session.user_id, date: date, count: req.session.linkCount};
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -139,12 +144,16 @@ app.delete('/urls/:shortURL/delete', (req,res) =>{
 
 //Put Routes
 app.put('/urls/:id', (req,res) =>{
+  const { updateURL } = req.body;
   let param = req.params.id;
   if (req.session.user_id) {
     let userId = urlDatabase[param].userID;
     if (userId && userId === req.session.user_id) {
       let date = new Date().toLocaleString();
-      urlDatabase[param] = {longURL: req.body.updateURL, userID: req.session.user_id, date: date};
+      if(!updateURL.includes('http://')){
+        longURL = 'http://' + updateURL;
+      }
+      urlDatabase[param] = {longURL, userID: req.session.user_id, date: date};
     }
     else{
       return res.render('errorPage', {status: 401, msg:'You Do Not Have Access To Modify This URL', user: users[req.session.user_id] , page: 'URL\'s', url: 'urls' })
