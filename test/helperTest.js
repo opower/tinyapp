@@ -1,6 +1,6 @@
 const { assert } = require('chai');
 
-const { emailExist } = require('../helper.js');
+const { emailExist, urlsForUser } = require('../helper.js');
 
 const testUsers = {
   "userRandomID": {
@@ -14,6 +14,16 @@ const testUsers = {
     password: "dishwasher-funk"
   }
 };
+const testDatabase = {
+  'B6EHu7': {
+    longUrl: 'http://youtube.com',
+    userID: 'A4eg32'
+  },
+  '46dsa': {
+    longUrl: 'http://google.ca',
+    userID: 'd093JU'
+  }
+}
 
 describe('emailExist', function() {
   it('should return a user with valid email', function() {
@@ -25,5 +35,21 @@ describe('emailExist', function() {
     const user = emailExist('', testUsers);
     const expectedOutput = undefined;
     assert.equal(user.id, expectedOutput);
+  });
+});
+
+describe('urlForUser', function() {
+  it('should return one url object', function() {
+    const url = urlsForUser("d093JU", testDatabase)
+    const expectedOutput = {'46dsa': {
+      longUrl: 'http://google.ca',
+      userID: 'd093JU'
+    }}
+    assert.deepEqual(url, expectedOutput);
+  });
+  it('should return an empty object if userId does not exist', function() {
+    const url = urlsForUser("d0u8dw", testDatabase)
+    const expectedOutput = {};
+    assert.deepEqual(url, expectedOutput);
   });
 });
