@@ -49,7 +49,7 @@ app.get('/urls/:shortURL', (req,res)=>{
     return res.render('errorPage', {url: 'urls', user: undefined, msg: 'Short URL Does Not Exisit', status: 404, page: 'URL\'s'});
   }
 
-  let templateVars = {shortURL : req.params.shortURL, longURL : urlDatabase[req.params.shortURL].longURL, user: users[req.session.user_id], date: urlDatabase[req.params.shortURL].date, count: req.session.linkCount}
+  let templateVars = {shortURL : req.params.shortURL, longURL : urlDatabase[req.params.shortURL].longURL, user: users[req.session.user_id], date: urlDatabase[req.params.shortURL].date}
   res.render('urls_show', templateVars);
 });
 
@@ -74,14 +74,13 @@ app.post('/urls', (req,res) =>{
   const { longURL } = req.body;
   let shortURL = generateRandomString();
   let date = new Date().toLocaleString();
-  req.session.linkCount = 0;
 
   if(!longURL.includes('http://')){
     let url = 'http://' + longURL;
-    urlDatabase[shortURL] = {longURL: url , userID: req.session.user_id, date: date, count: req.session.linkCount};
+    urlDatabase[shortURL] = {longURL: url , userID: req.session.user_id, date: date};
   }
   else{
-    urlDatabase[shortURL] = {longURL , userID: req.session.user_id, date: date, count: req.session.linkCount};
+    urlDatabase[shortURL] = {longURL , userID: req.session.user_id, date: date};
   }
   res.redirect(`/urls/${shortURL}`);
 });
