@@ -154,10 +154,11 @@ app.put('/urls/:id', (req,res) =>{
     let userId = urlDatabase[param].userID;
     if (userId && userId === req.session.user_id) {
       let date = new Date().toLocaleString();
+      let url = '';
       if(!updateURL.includes('http')){
-        longURL = 'https://' + updateURL;
+         url = 'https://' + updateURL;
       }
-      urlDatabase[param] = {longURL, userID: req.session.user_id, date: date};
+      urlDatabase[param] = {longURL: url, userID: req.session.user_id, date: date};
     }
     else{
       return res.render('errorPage', {status: 401, msg:'You Do Not Have Access To Modify This URL', user: users[req.session.user_id] , page: 'URL\'s', url: 'urls' })
