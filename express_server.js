@@ -50,13 +50,13 @@ app.get('/urls/:shortURL', (req,res)=>{
   }
 
   urlDatabase[req.params.shortURL].clicks = urlDatabase[req.params.shortURL].clicks + 1;
-  let templateVars = {shortURL : req.params.shortURL, longURL : urlDatabase[req.params.shortURL].longURL, user: users[req.session.user_id], date: urlDatabase[req.params.shortURL].date, clicks: urlDatabase[req.params.shortURL].clicks }
+  let templateVars = {shortURL : req.params.shortURL, longURL : urlDatabase[req.params.shortURL].longURL, user: users[req.session.user_id], date: urlDatabase[req.params.shortURL].date }
   res.render('urls_show', templateVars);
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  if(!urlDatabase[req.params.shortURL]){
-    res.render('errorPage', {status:403, msg:'Short URL does not exist', page: 'Your URLS', user: undefined, url:'urls'});
+  if(!urlDatabase[req.params.shortURL] || urlDatabase[req.params.shortURL].userID !== req.session.user_id){
+    return res.render('errorPage', {status:403, msg:'Short URL does not exist', page: 'Your URLS', user: undefined, url:'urls'});
   }
   res.redirect(urlDatabase[req.params.shortURL].longURL);
 });
@@ -76,12 +76,12 @@ app.post('/urls', (req,res) =>{
   let shortURL = generateRandomString();
   let date = new Date().toLocaleString();
 
-  if(!longURL.includes('http://')){
-    let url = 'http://' + longURL;
-    urlDatabase[shortURL] = {longURL: url , userID: req.session.user_id, date: date, clicks: 0};
+  if(!longURL.includes('http')){
+    let url = 'https://' + longURL;
+    urlDatabase[shortURL] = {longURL: url , userID: req.session.user_id, date: date};
   }
   else{
-    urlDatabase[shortURL] = {longURL , userID: req.session.user_id, date: date, clicks: 0};
+    urlDatabase[shortURL] = {longURL , userID: req.session.user_id, date: date};
   }
   res.redirect(`/urls/${shortURL}`);
 });
@@ -150,15 +150,14 @@ app.delete('/urls/:shortURL/delete', (req,res) =>{
 app.put('/urls/:id', (req,res) =>{
   const { updateURL } = req.body;
   let param = req.params.id;
-  let linkClicks = urlDatabase[param].clicks;
   if (req.session.user_id) {
     let userId = urlDatabase[param].userID;
     if (userId && userId === req.session.user_id) {
       let date = new Date().toLocaleString();
-      if(!updateURL.includes('http://')){
-        longURL = 'http://' + updateURL;
+      if(!updateURL.includes('http')){
+        longURL = 'https://' + updateURL;
       }
-      urlDatabase[param] = {longURL, userID: req.session.user_id, date: date, clicks: linkClicks};
+      urlDatabase[param] = {longURL, userID: req.session.user_id, date: date};
     }
     else{
       return res.render('errorPage', {status: 401, msg:'You Do Not Have Access To Modify This URL', user: users[req.session.user_id] , page: 'URL\'s', url: 'urls' })

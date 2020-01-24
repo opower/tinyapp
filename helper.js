@@ -41,7 +41,8 @@ const urlsForUser = (id, database) => {
 
   for (const url of entries) {
     if (url[1].userID === id) {
-      urls[url[0]] = url[1];
+      let key = url[0]
+      urls[key] = url[1];
     }
   }
   return urls;
