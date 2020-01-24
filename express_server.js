@@ -49,7 +49,8 @@ app.get('/urls/:shortURL', (req,res)=>{
     return res.render('errorPage', {url: 'urls', user: undefined, msg: 'Short URL Does Not Exisit', status: 404, page: 'URL\'s'});
   }
 
-  let templateVars = {shortURL : req.params.shortURL, longURL : urlDatabase[req.params.shortURL].longURL, user: users[req.session.user_id], date: urlDatabase[req.params.shortURL].date}
+  urlDatabase[req.params.shortURL].clicks = urlDatabase[req.params.shortURL].clicks + 1;
+  let templateVars = {shortURL : req.params.shortURL, longURL : urlDatabase[req.params.shortURL].longURL, user: users[req.session.user_id], date: urlDatabase[req.params.shortURL].date, clicks: urlDatabase[req.params.shortURL].clicks }
   res.render('urls_show', templateVars);
 });
 
@@ -77,10 +78,10 @@ app.post('/urls', (req,res) =>{
 
   if(!longURL.includes('http://')){
     let url = 'http://' + longURL;
-    urlDatabase[shortURL] = {longURL: url , userID: req.session.user_id, date: date};
+    urlDatabase[shortURL] = {longURL: url , userID: req.session.user_id, date: date, clicks: 0};
   }
   else{
-    urlDatabase[shortURL] = {longURL , userID: req.session.user_id, date: date};
+    urlDatabase[shortURL] = {longURL , userID: req.session.user_id, date: date, clicks: 0};
   }
   res.redirect(`/urls/${shortURL}`);
 });
@@ -149,6 +150,7 @@ app.delete('/urls/:shortURL/delete', (req,res) =>{
 app.put('/urls/:id', (req,res) =>{
   const { updateURL } = req.body;
   let param = req.params.id;
+  let linkClicks = urlDatabase[param].clicks;
   if (req.session.user_id) {
     let userId = urlDatabase[param].userID;
     if (userId && userId === req.session.user_id) {
@@ -156,7 +158,7 @@ app.put('/urls/:id', (req,res) =>{
       if(!updateURL.includes('http://')){
         longURL = 'http://' + updateURL;
       }
-      urlDatabase[param] = {longURL, userID: req.session.user_id, date: date};
+      urlDatabase[param] = {longURL, userID: req.session.user_id, date: date, clicks: linkClicks};
     }
     else{
       return res.render('errorPage', {status: 401, msg:'You Do Not Have Access To Modify This URL', user: users[req.session.user_id] , page: 'URL\'s', url: 'urls' })
